@@ -980,11 +980,13 @@ function DAO:select(primary_key, options)
     validate_options_type(options)
   end
 
-  local ok, errors = self.schema:validate_primary_key(primary_key)
+  local ok, errors = self.schema:validate_primary_key(primary_key, true)
   if not ok then
     local err_t = self.errors:invalid_primary_key(errors)
     return nil, tostring(err_t), err_t
   end
+
+  primary_key = self.schema:extract_pk_values(primary_key)
 
   if options ~= nil then
     ok, errors = validate_options_value(self, options)
@@ -1171,11 +1173,13 @@ function DAO:update(primary_key, entity, options)
     validate_options_type(options)
   end
 
-  local ok, errors = self.schema:validate_primary_key(primary_key)
+  local ok, errors = self.schema:validate_primary_key(primary_key, true)
   if not ok then
     local err_t = self.errors:invalid_primary_key(errors)
     return nil, tostring(err_t), err_t
   end
+
+  primary_key = self.schema:extract_pk_values(primary_key)
 
   local entity_to_update, rbw_entity, err, err_t = check_update(self,
                                                                 primary_key,
@@ -1223,11 +1227,13 @@ function DAO:upsert(primary_key, entity, options)
     validate_options_type(options)
   end
 
-  local ok, errors = self.schema:validate_primary_key(primary_key)
+  local ok, errors = self.schema:validate_primary_key(primary_key, true)
   if not ok then
     local err_t = self.errors:invalid_primary_key(errors)
     return nil, tostring(err_t), err_t
   end
+
+  primary_key = self.schema:extract_pk_values(primary_key)
 
   local entity_to_upsert, rbw_entity, err, err_t = check_upsert(self,
                                                                 primary_key,
@@ -1279,11 +1285,13 @@ function DAO:delete(primary_key, options)
     validate_options_type(options)
   end
 
-  local ok, errors = self.schema:validate_primary_key(primary_key)
+  local ok, errors = self.schema:validate_primary_key(primary_key, true)
   if not ok then
     local err_t = self.errors:invalid_primary_key(errors)
     return nil, tostring(err_t), err_t
   end
+
+  primary_key = self.schema:extract_pk_values(primary_key)
 
   local show_ws_id = { show_ws_id = true }
   local entity, err, err_t = self:select(primary_key, show_ws_id)
