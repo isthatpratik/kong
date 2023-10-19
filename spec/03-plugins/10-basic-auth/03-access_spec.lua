@@ -145,6 +145,7 @@ for _, strategy in helpers.each_strategy() do
         local json = cjson.decode(body)
         assert.not_nil(json)
         assert.matches("Unauthorized", json.message)
+        assert.equal('Basic realm="' .. meta._NAME .. '"', res.headers["WWW-Authenticate"])
       end)
 
       it("returns WWW-Authenticate header on missing credentials", function()
@@ -176,6 +177,7 @@ for _, strategy in helpers.each_strategy() do
         local json = cjson.decode(body)
         assert.not_nil(json)
         assert.matches("Invalid authentication credentials", json.message)
+        assert.equal('Basic realm="' .. meta._NAME .. '"', res.headers["WWW-Authenticate"])
       end)
 
       it("returns 401 Unauthorized on invalid credentials in Proxy-Authorization", function()
@@ -191,6 +193,7 @@ for _, strategy in helpers.each_strategy() do
         local json = cjson.decode(body)
         assert.not_nil(json)
         assert.matches("Invalid authentication credentials", json.message)
+        assert.equal('Basic realm="' .. meta._NAME .. '"', res.headers["WWW-Authenticate"])
       end)
 
       it("returns 401 Unauthorized on password only", function()
@@ -206,6 +209,7 @@ for _, strategy in helpers.each_strategy() do
         local json = cjson.decode(body)
         assert.not_nil(json)
         assert.matches("Invalid authentication credentials", json.message)
+        assert.equal('Basic realm="' .. meta._NAME .. '"', res.headers["WWW-Authenticate"])
       end)
 
       it("returns 401 Unauthorized on username only", function()
@@ -221,6 +225,7 @@ for _, strategy in helpers.each_strategy() do
         local json = cjson.decode(body)
         assert.not_nil(json)
         assert.matches("Invalid authentication credentials", json.message)
+        assert.equal('Basic realm="' .. meta._NAME .. '"', res.headers["WWW-Authenticate"])
       end)
 
       it("rejects gRPC call without credentials", function()
@@ -296,6 +301,7 @@ for _, strategy in helpers.each_strategy() do
         local json = cjson.decode(body)
         assert.not_nil(json)
         assert.matches("Invalid authentication credentials", json.message)
+        assert.equal('Basic realm="' .. meta._NAME .. '"', res.headers["WWW-Authenticate"])
       end)
 
       it("authenticates valid credentials in Proxy-Authorization", function()
@@ -564,6 +570,7 @@ for _, strategy in helpers.each_strategy() do
           }
         })
         assert.response(res).has.status(401)
+        assert.equal('Key realm="' .. meta._NAME .. '"', res.headers["WWW-Authenticate"])
       end)
 
       it("fails 401, with no credential provided", function()
@@ -575,6 +582,7 @@ for _, strategy in helpers.each_strategy() do
           }
         })
         assert.response(res).has.status(401)
+        assert.equal('Key realm="' .. meta._NAME .. '"', res.headers["WWW-Authenticate"])
       end)
 
     end)
