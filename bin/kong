@@ -6,8 +6,8 @@ package.path = (os.getenv("KONG_LUA_PATH_OVERRIDE") or "") .. "./?.lua;./?/init.
 require("kong.globalpatches")({ cli = true })
 math.randomseed() -- Generate PRNG seed
 
+local unix = require "unix"
 local pl_app = require "pl.lapp"
-local pl_utils = require "pl.utils"
 local pl_tablex = require "pl.tablex"
 local inject_confs = require "kong.cmd.utils.inject_confs"
 
@@ -141,10 +141,13 @@ package.path = (os.getenv("KONG_LUA_PATH_OVERRIDE") or "") .. "./?.lua;./?/init.
 require("kong.cmd.init")("%s", %s)
 ]], cmd_name, args_str)
 
-local resty_cmd = string.format(
-  "resty --main-conf \"%s\" --http-conf \"%s\" --stream-conf \"%s\" -e '%s'",
-  main_conf, http_conf, stream_conf, inline_code)
-
-local _, code = pl_utils.execute(resty_cmd)
-os.exit(code)
+local _, err = unix.execlp(
+        "resty", "resty",
+        "--main-conf", main_conf or '',
+        "--http-conf", http_conf or '',
+        "--stream-conf", stream_conf or '',
+        "-e", inline_code or '')
+-- if unix.execlp returns, an error has occurred
+print('could not exec resty: ', err)
+os.exit(1)
 -- vim: set ft=lua ts=2 sw=2 sts=2 et :
