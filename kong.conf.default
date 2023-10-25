@@ -2172,4 +2172,5 @@
 
                         # If this option is set, vector.dev
                         # will be started and all error logs
-                        # will also be sent.
+                        # will sent to it, in addition to the
+                        # log files.
