@@ -722,11 +722,31 @@ local function register_property_handlers()
     return true, kong.request.get_source(), false
   end)
 
+  properties.add_getter("kong.router.route", function(kong)
+    local route = kong.router.get_route()
+    if not route then
+      return true, nil, true
+    end
+    return true, cjson_encode(route), true
+  end)
+
+  properties.add_getter("kong.router.service", function(kong)
+    local service = kong.router.get_service()
+    if not service then
+      return true, nil, true
+    end
+    return true, cjson_encode(service), true
+  end)
+
   properties.add_getter("kong.route_id", function(_, _, ctx)
     local value = ctx.route and ctx.route.id
     local ok = value ~= nil
     local const = ok
     return ok, value, const
+  end)
+
+  properties.add_getter("kong.service.response.status", function(kong)
+    return true, kong.service.response.get_status(), false
   end)
 
   properties.add_getter("kong.service_id", function(_, _, ctx)
@@ -751,6 +771,28 @@ local function register_property_handlers()
     function(kong, _, _, key, value)
       kong.ctx.shared[key] = value
       return true
+    end
+  )
+
+  properties.add_namespace_handlers("kong.configuration",
+    function(kong, _, _, key)
+      local value = kong.configuration[key]
+      if value ~= nil then
+        if type(value) == "table" then
+          value = cjson_decode(value)
+        else
+          value = tostring(value)
+        end
+
+        return true, value, true
+      end
+
+      return false
+    end,
+
+    function()
+      -- kong.configuration is read-only: setter rejects all
+      return false
     end
   )
 end

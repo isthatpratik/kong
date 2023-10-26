@@ -473,6 +473,88 @@ describe("proxy-wasm filters (#wasm) (#" .. strategy .. ")", function()
       assert.logfile().has.no.line("[crit]",  true, 0)
     end)
 
+    it("read kong.router.route", function()
+      local client = helpers.proxy_client()
+      finally(function() client:close() end)
+
+      local res = assert(client:send {
+        method = "GET",
+        path = "/single/status/200",
+        headers = {
+          [HEADER_NAME_TEST] = "get_kong_property",
+          [HEADER_NAME_INPUT] = "router.route",
+          [HEADER_NAME_DISPATCH_ECHO] = "on",
+        }
+      })
+
+      local body = assert.res_status(200, res)
+      local json = cjson.decode(body)
+      assert.equal(json.id, r_single.id)
+      assert.logfile().has.no.line("[error]", true, 0)
+      assert.logfile().has.no.line("[crit]",  true, 0)
+    end)
+
+    it("read kong.router.service", function()
+      local client = helpers.proxy_client()
+      finally(function() client:close() end)
+
+      local res = assert(client:send {
+        method = "GET",
+        path = "/single/status/200",
+        headers = {
+          [HEADER_NAME_TEST] = "get_kong_property",
+          [HEADER_NAME_INPUT] = "router.service",
+          [HEADER_NAME_DISPATCH_ECHO] = "on",
+        }
+      })
+
+      local body = assert.res_status(200, res)
+      local json = cjson.decode(body)
+      assert.equal(json.id, mock_service.id)
+      assert.logfile().has.no.line("[error]", true, 0)
+      assert.logfile().has.no.line("[crit]",  true, 0)
+    end)
+
+    it("read kong.service.response.status", function()
+      local client = helpers.proxy_client()
+      finally(function() client:close() end)
+
+      local res = assert(client:send {
+        method = "GET",
+        path = "/single/status/200",
+        headers = {
+          [HEADER_NAME_TEST] = "get_kong_property",
+          [HEADER_NAME_INPUT] = "service.response.status",
+          [HEADER_NAME_DISPATCH_ECHO] = "on",
+        }
+      })
+
+      local body = assert.res_status(200, res)
+      assert.equal("200", body)
+      assert.logfile().has.no.line("[error]", true, 0)
+      assert.logfile().has.no.line("[crit]",  true, 0)
+    end)
+
+    it("read kong.configuration", function()
+      local client = helpers.proxy_client()
+      finally(function() client:close() end)
+
+      local res = assert(client:send {
+        method = "GET",
+        path = "/single/status/200",
+        headers = {
+          [HEADER_NAME_TEST] = "get_kong_property",
+          [HEADER_NAME_INPUT] = "configuration.role",
+          [HEADER_NAME_DISPATCH_ECHO] = "on",
+        }
+      })
+
+      local body = assert.res_status(200, res)
+      assert.equal("traditional", body)
+      assert.logfile().has.no.line("[error]", true, 0)
+      assert.logfile().has.no.line("[crit]",  true, 0)
+    end)
+
     it("read kong.route_id", function()
       local client = helpers.proxy_client()
       finally(function() client:close() end)
