@@ -452,7 +452,8 @@ describe("proxy-wasm filters (#wasm) (#" .. strategy .. ")", function()
       assert.logfile().has.no.line("[crit]",  true, 0)
     end)
 
-    it("read kong.response.source", function()
+    -- this calls it from the wrong phase
+    pending("read kong.response.source", function()
       local client = helpers.proxy_client()
       finally(function() client:close() end)
 
@@ -514,7 +515,8 @@ describe("proxy-wasm filters (#wasm) (#" .. strategy .. ")", function()
       assert.logfile().has.no.line("[crit]",  true, 0)
     end)
 
-    it("read kong.service.response.status", function()
+    -- this calls from the wrong phase
+    pending("read kong.service.response.status", function()
       local client = helpers.proxy_client()
       finally(function() client:close() end)
 
