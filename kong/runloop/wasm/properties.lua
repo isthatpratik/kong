@@ -74,6 +74,7 @@ function _M.add_namespace_handlers(name, get, set)
   assert(type(name) == "string")
   assert(type(get) == "function")
   assert(type(set) == "function")
+
   namespace_handlers[name] = { get = get, set = set }
   rebuild_namespaces()
 end
@@ -88,12 +89,14 @@ function _M.get(name)
 
   local getter = simple_getters[name]
   if getter then
+    jit.off(getter)
     ok, value, const = getter(kong, ngx, ngx.ctx)
 
   else
     local ns, key = get_namespace(name)
 
     if ns then
+      jit.off(ns.get)
       ok, value, const = ns.get(kong, ngx, ngx.ctx, key)
     end
   end
@@ -112,11 +115,13 @@ function _M.set(name, value)
 
   local setter = simple_setters[name]
   if setter then
+    jit.off(setter)
     ok, cached_value, const = setter(kong, ngx, ngx.ctx, value)
 
   else
     local ns, key = get_namespace(name)
     if ns then
+      jit.off(ns.set)
       ok, cached_value, const = ns.set(kong, ngx, ngx.ctx, key, value)
     end
   end
