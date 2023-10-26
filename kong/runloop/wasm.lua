@@ -924,6 +924,8 @@ function _M.attach(ctx)
     return kong.response.error(500)
   end
 
+  jit.off(properties.get)
+  jit.off(properties.set)
   proxy_wasm.set_property_getter(properties.get)
   proxy_wasm.set_property_setter(properties.set)
 
