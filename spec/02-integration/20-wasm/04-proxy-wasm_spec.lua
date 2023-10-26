@@ -368,7 +368,6 @@ describe("proxy-wasm filters (#wasm) (#" .. strategy .. ")", function()
 
       local body = assert.res_status(200, res)
       assert.matches(UUID_PATTERN, body)
-      assert.equal("", body)
       assert.logfile().has.no.line("[error]", true, 0)
       assert.logfile().has.no.line("[crit]",  true, 0)
     end)
