@@ -722,6 +722,10 @@ local function register_property_handlers()
     return true, kong.request.get_source(), false
   end)
 
+  properties.add_setter("kong.response.status", function(kong, _, _, status)
+    return true, kong.response.set_status(status), false
+  end)
+
   properties.add_getter("kong.router.route", function(kong)
     local route = kong.router.get_route()
     if not route then
@@ -736,6 +740,32 @@ local function register_property_handlers()
       return true, nil, true
     end
     return true, cjson_encode(service), true
+  end)
+
+  properties.add_setter("kong.service.target", function(kong, _, _, target)
+    local host, port = target:match("^(.*):([0-9]+)$")
+    port = tonumber(port)
+    if not (host and port) then
+      return false
+    end
+
+    kong.service.set_target(host, port)
+    return true, target, false
+  end)
+
+  properties.add_setter("kong.service.upstream", function(kong, _, _, upstream)
+    local ok, err = kong.service.set_upstream(upstream)
+    if not ok then
+      kong.log.err(err)
+      return false
+    end
+
+    return true, upstream, false
+  end)
+
+  properties.add_setter("kong.service.request.scheme", function(kong, _, _, scheme)
+    kong.service.request.set_scheme(scheme)
+    return true, scheme, false
   end)
 
   properties.add_getter("kong.route_id", function(_, _, ctx)

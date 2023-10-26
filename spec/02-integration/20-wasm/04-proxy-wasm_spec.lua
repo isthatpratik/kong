@@ -515,6 +515,71 @@ describe("proxy-wasm filters (#wasm) (#" .. strategy .. ")", function()
       assert.logfile().has.no.line("[crit]",  true, 0)
     end)
 
+    it("write kong.service.target", function()
+      local client = helpers.proxy_client()
+      finally(function() client:close() end)
+
+      local target = helpers.mock_upstream_host .. ":" ..
+                     helpers.mock_upstream_port
+
+      local res = assert(client:send {
+        method = "GET",
+        path = "/single/status/200",
+        headers = {
+          [HEADER_NAME_TEST] = "set_kong_property",
+          [HEADER_NAME_INPUT] = "service.target=" .. target,
+          [HEADER_NAME_DISPATCH_ECHO] = "on",
+        }
+      })
+
+      local body = assert.res_status(200, res)
+      assert.equal(target, body)
+      assert.logfile().has.no.line("[error]", true, 0)
+      assert.logfile().has.no.line("[crit]",  true, 0)
+    end)
+
+    it("write kong.service.upstream", function()
+      local client = helpers.proxy_client()
+      finally(function() client:close() end)
+
+      local upstream = helpers.mock_upstream_host
+
+      local res = assert(client:send {
+        method = "GET",
+        path = "/single/status/200",
+        headers = {
+          [HEADER_NAME_TEST] = "set_kong_property",
+          [HEADER_NAME_INPUT] = "service.upstream=" .. upstream,
+          [HEADER_NAME_DISPATCH_ECHO] = "on",
+        }
+      })
+
+      local body = assert.res_status(200, res)
+      assert.equal(upstream, body)
+      assert.logfile().has.no.line("[error]", true, 0)
+      assert.logfile().has.no.line("[crit]",  true, 0)
+    end)
+
+    it("write kong.service.request.scheme", function()
+      local client = helpers.proxy_client()
+      finally(function() client:close() end)
+
+      local res = assert(client:send {
+        method = "GET",
+        path = "/single/status/200",
+        headers = {
+          [HEADER_NAME_TEST] = "set_kong_property",
+          [HEADER_NAME_INPUT] = "service.request.scheme=http",
+          [HEADER_NAME_DISPATCH_ECHO] = "on",
+        }
+      })
+
+      local body = assert.res_status(200, res)
+      assert.equal("http", body)
+      assert.logfile().has.no.line("[error]", true, 0)
+      assert.logfile().has.no.line("[crit]",  true, 0)
+    end)
+
     -- this calls from the wrong phase
     pending("read kong.service.response.status", function()
       local client = helpers.proxy_client()
@@ -532,6 +597,26 @@ describe("proxy-wasm filters (#wasm) (#" .. strategy .. ")", function()
 
       local body = assert.res_status(200, res)
       assert.equal("200", body)
+      assert.logfile().has.no.line("[error]", true, 0)
+      assert.logfile().has.no.line("[crit]",  true, 0)
+    end)
+
+    it("write kong.response.status", function()
+      local client = helpers.proxy_client()
+      finally(function() client:close() end)
+
+      local res = assert(client:send {
+        method = "GET",
+        path = "/single/status/200",
+        headers = {
+          [HEADER_NAME_TEST] = "set_kong_property",
+          [HEADER_NAME_INPUT] = "response.status=203",
+          [HEADER_NAME_DISPATCH_ECHO] = "on",
+        }
+      })
+
+      local body = assert.res_status(203, res)
+      assert.equal("203", body)
       assert.logfile().has.no.line("[error]", true, 0)
       assert.logfile().has.no.line("[crit]",  true, 0)
     end)
