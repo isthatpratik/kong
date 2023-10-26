@@ -10,6 +10,7 @@ local HEADER_NAME_ADD_REQ_HEADER = "X-PW-Add-Header"
 local HEADER_NAME_ADD_RESP_HEADER = "X-PW-Add-Resp-Header"
 local HEADER_NAME_LUA_PROPERTY = "X-Lua-Property"
 local HEADER_NAME_LUA_VALUE = "X-Lua-Value"
+local UUID_PATTERN = "%x%x%x%x%x%x%x%x%-%x%x%x%x%-%x%x%x%x%-%x%x%x%x%-%x%x%x%x%x%x%x%x%x%x%x%x"
 
 local DNS_HOSTNAME = "wasm.test"
 local MOCK_UPSTREAM_DNS_ADDR = DNS_HOSTNAME .. ":" .. helpers.mock_upstream_port
@@ -307,6 +308,167 @@ describe("proxy-wasm filters (#wasm) (#" .. strategy .. ")", function()
 
       local body = assert.res_status(200, res)
       assert.equal("Hello from proxy-wasm", body)
+      assert.logfile().has.no.line("[error]", true, 0)
+      assert.logfile().has.no.line("[crit]",  true, 0)
+    end)
+
+    it("read kong.client.protocol", function()
+      local client = helpers.proxy_client()
+      finally(function() client:close() end)
+
+      local res = assert(client:send {
+        method = "GET",
+        path = "/single/status/200",
+        headers = {
+          [HEADER_NAME_TEST] = "get_kong_property",
+          [HEADER_NAME_INPUT] = "client.protocol",
+          [HEADER_NAME_DISPATCH_ECHO] = "on",
+        }
+      })
+
+      local body = assert.res_status(200, res)
+      assert.equal("http", body)
+      assert.logfile().has.no.line("[error]", true, 0)
+      assert.logfile().has.no.line("[crit]",  true, 0)
+    end)
+
+    it("read kong.nginx.subsystem", function()
+      local client = helpers.proxy_client()
+      finally(function() client:close() end)
+
+      local res = assert(client:send {
+        method = "GET",
+        path = "/single/status/200",
+        headers = {
+          [HEADER_NAME_TEST] = "get_kong_property",
+          [HEADER_NAME_INPUT] = "nginx.subsystem",
+          [HEADER_NAME_DISPATCH_ECHO] = "on",
+        }
+      })
+
+      local body = assert.res_status(200, res)
+      assert.equal("http", body)
+      assert.logfile().has.no.line("[error]", true, 0)
+      assert.logfile().has.no.line("[crit]",  true, 0)
+    end)
+
+    it("read kong.node.id", function()
+      local client = helpers.proxy_client()
+      finally(function() client:close() end)
+
+      local res = assert(client:send {
+        method = "GET",
+        path = "/single/status/200",
+        headers = {
+          [HEADER_NAME_TEST] = "get_kong_property",
+          [HEADER_NAME_INPUT] = "node.id",
+          [HEADER_NAME_DISPATCH_ECHO] = "on",
+        }
+      })
+
+      local body = assert.res_status(200, res)
+      assert.matches(UUID_PATTERN, body)
+      assert.equal("", body)
+      assert.logfile().has.no.line("[error]", true, 0)
+      assert.logfile().has.no.line("[crit]",  true, 0)
+    end)
+
+    it("read kong.node.memory_stats", function()
+      local client = helpers.proxy_client()
+      finally(function() client:close() end)
+
+      local res = assert(client:send {
+        method = "GET",
+        path = "/single/status/200",
+        headers = {
+          [HEADER_NAME_TEST] = "get_kong_property",
+          [HEADER_NAME_INPUT] = "node.memory_stats",
+          [HEADER_NAME_DISPATCH_ECHO] = "on",
+        }
+      })
+
+      local body = assert.res_status(200, res)
+      assert.matches("{.*lua_shared_dicts.*}", body)
+      assert.logfile().has.no.line("[error]", true, 0)
+      assert.logfile().has.no.line("[crit]",  true, 0)
+    end)
+
+    it("read kong.request.forwarded_host", function()
+      local client = helpers.proxy_client()
+      finally(function() client:close() end)
+
+      local res = assert(client:send {
+        method = "GET",
+        path = "/single/status/200",
+        headers = {
+          [HEADER_NAME_TEST] = "get_kong_property",
+          [HEADER_NAME_INPUT] = "request.forwarded_host",
+          [HEADER_NAME_DISPATCH_ECHO] = "on",
+        }
+      })
+
+      local body = assert.res_status(200, res)
+      assert.matches("^[a-z.0-9%-]+$", body)
+      assert.logfile().has.no.line("[error]", true, 0)
+      assert.logfile().has.no.line("[crit]",  true, 0)
+    end)
+
+    it("read kong.request.forwarded_port", function()
+      local client = helpers.proxy_client()
+      finally(function() client:close() end)
+
+      local res = assert(client:send {
+        method = "GET",
+        path = "/single/status/200",
+        headers = {
+          [HEADER_NAME_TEST] = "get_kong_property",
+          [HEADER_NAME_INPUT] = "request.forwarded_port",
+          [HEADER_NAME_DISPATCH_ECHO] = "on",
+        }
+      })
+
+      local body = assert.res_status(200, res)
+      assert.matches("^[0-9]+$", body)
+      assert.logfile().has.no.line("[error]", true, 0)
+      assert.logfile().has.no.line("[crit]",  true, 0)
+    end)
+
+    it("read kong.request.forwarded_scheme", function()
+      local client = helpers.proxy_client()
+      finally(function() client:close() end)
+
+      local res = assert(client:send {
+        method = "GET",
+        path = "/single/status/200",
+        headers = {
+          [HEADER_NAME_TEST] = "get_kong_property",
+          [HEADER_NAME_INPUT] = "request.forwarded_scheme",
+          [HEADER_NAME_DISPATCH_ECHO] = "on",
+        }
+      })
+
+      local body = assert.res_status(200, res)
+      assert.equal("http", body)
+      assert.logfile().has.no.line("[error]", true, 0)
+      assert.logfile().has.no.line("[crit]",  true, 0)
+    end)
+
+    it("read kong.response.source", function()
+      local client = helpers.proxy_client()
+      finally(function() client:close() end)
+
+      local res = assert(client:send {
+        method = "GET",
+        path = "/single/status/200",
+        headers = {
+          [HEADER_NAME_TEST] = "get_kong_property",
+          [HEADER_NAME_INPUT] = "response.source",
+          [HEADER_NAME_DISPATCH_ECHO] = "on",
+        }
+      })
+
+      local body = assert.res_status(200, res)
+      assert.equal("service", body)
       assert.logfile().has.no.line("[error]", true, 0)
       assert.logfile().has.no.line("[crit]",  true, 0)
     end)

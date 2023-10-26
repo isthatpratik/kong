@@ -682,6 +682,46 @@ end
 local function register_property_handlers()
   properties.reset()
 
+  properties.add_getter("kong.client.protocol", function(kong)
+    return true, kong.client.get_protocol(), true
+  end)
+
+  properties.add_getter("kong.nginx.subsystem", function(kong)
+    return true, kong.nginx.get_subsystem(), true
+  end)
+
+  properties.add_getter("kong.node.id", function(kong)
+    return true, kong.node.get_id(), true
+  end)
+
+  properties.add_getter("kong.node.memory_stats", function(kong)
+    local stats = kong.node.get_memory_stats()
+    if not stats then
+      return false
+    end
+    return true, cjson_encode(stats), false
+  end)
+
+  properties.add_getter("kong.request.forwarded_host", function(kong)
+    return true, kong.request.get_forwarded_host(), true
+  end)
+
+  properties.add_getter("kong.request.forwarded_port", function(kong)
+    return true, kong.request.get_forwarded_port(), true
+  end)
+
+  properties.add_getter("kong.request.forwarded_scheme", function(kong)
+    return true, kong.request.get_forwarded_scheme(), true
+  end)
+
+  properties.add_getter("kong.request.port", function(kong)
+    return true, kong.request.get_port(), true
+  end)
+
+  properties.add_getter("kong.response.source", function(kong)
+    return true, kong.request.get_source(), false
+  end)
+
   properties.add_getter("kong.route_id", function(_, _, ctx)
     local value = ctx.route and ctx.route.id
     local ok = value ~= nil
