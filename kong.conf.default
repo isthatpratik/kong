@@ -2166,11 +2166,9 @@
 # KONNECT LOG SHIPPING
 #------------------------------------------------------------------------------
 
-#error_log_pipe_path =
-                        # Path to named pipe for error
-                        # log shipping through vector.dev
+#error_log_pipe_path =  # Path to named pipe for error log shipping
+                        # through vector.dev
 
-                        # If this option is set, vector.dev
-                        # will be started and all error logs
-                        # will sent to it, in addition to the
-                        # log files.
+                        # If this option is set, vector.dev will be
+                        # started and all error logs will be sent to
+                        # it, in addition to the log files.
