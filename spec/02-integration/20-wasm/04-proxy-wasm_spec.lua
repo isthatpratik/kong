@@ -532,7 +532,7 @@ describe("proxy-wasm filters (#wasm) (#" .. strategy .. ")", function()
         }
       })
 
-      local body = assert.res_status(200, res)
+      assert.res_status(200, res)
       -- TODO read back property
       assert.logfile().has.no.line("[error]", true, 0)
       assert.logfile().has.no.line("[crit]",  true, 0)
@@ -554,7 +554,7 @@ describe("proxy-wasm filters (#wasm) (#" .. strategy .. ")", function()
         }
       })
 
-      local body = assert.res_status(200, res)
+      assert.res_status(200, res)
       -- TODO read back property
       assert.logfile().has.no.line("[error]", true, 0)
       assert.logfile().has.no.line("[crit]",  true, 0)
@@ -574,7 +574,7 @@ describe("proxy-wasm filters (#wasm) (#" .. strategy .. ")", function()
         }
       })
 
-      local body = assert.res_status(200, res)
+      assert.res_status(200, res)
       assert.logfile().has.no.line("[error]", true, 0)
       assert.logfile().has.no.line("[crit]",  true, 0)
     end)
@@ -614,7 +614,7 @@ describe("proxy-wasm filters (#wasm) (#" .. strategy .. ")", function()
         }
       })
 
-      local body = assert.res_status(203, res)
+      assert.res_status(203, res)
       -- TODO read back property
       assert.logfile().has.no.line("[error]", true, 0)
       assert.logfile().has.no.line("[crit]",  true, 0)
